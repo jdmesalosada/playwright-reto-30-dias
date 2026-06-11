@@ -1,12 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { LoginPage } from '../pageobjects/LoginPage'
 
 test('Check left menu options', async ({ page }) => {
 
 
-    await page.goto('https://opensource-demo.orangehrmlive.com/')
-    await page.getByRole('textbox', { name: 'Username' }).fill('Admin')
-    await page.getByRole('textbox', { name: 'Password' }).fill('admin123')
-    await page.getByRole('button', { name: 'Login' }).click()
+    const loginPage = new LoginPage(page)
+    await loginPage.loginAsAdmin()
 
     await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
 

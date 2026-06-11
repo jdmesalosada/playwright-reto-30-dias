@@ -5,7 +5,7 @@ import { SideMenuOption, SidePanel } from '../components/SidePanel'
 test('Login to hrm', async ({ page }) => {
 
     const loginPage = new LoginPage(page)
-    await loginPage.doLogin('Admin', 'admin123')
+    await loginPage.loginAsAdmin()
 
     const sidePanel = new SidePanel(page)
     await sidePanel.clickOnOption(SideMenuOption.ADMIN)
