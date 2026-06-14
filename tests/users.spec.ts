@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { LoginPage } from "../pageobjects/LoginPage"
+import { SideMenuOption, SidePanel } from "../components/SidePanel"
 
 test('Get all the usernames registered', async ({ page }) => {
     
@@ -66,4 +67,26 @@ test('Select specific user for edition', async ({ page }) => {
 
     expect(page.locator("//label[contains(., 'Username')]/parent::div/following-sibling::div/input"))
      .toHaveValue(currentUsername)    
+})
+
+
+test('Check user role options', async({page}) => {
+
+    const expectedRoleOptions = [ '-- Select --', 'Admin', 'ESS', 'Pepe' ]
+
+    const loginPage = new LoginPage(page)
+    await loginPage.loginAsAdmin()
+
+    const sidePanel = new SidePanel(page)
+    await sidePanel.clickOnOption(SideMenuOption.ADMIN)
+
+    await page.locator("//label[contains(.,'User Role')]/parent::div/following-sibling::div").click()
+    const currentUserRoleOptions = await page.getByRole('listbox').getByRole('option').allInnerTexts()
+
+    console.log(currentUserRoleOptions)
+
+    expect(currentUserRoleOptions, 
+        'The options displayed in the User Role Dropdown do not match the expected options.').toEqual(expectedRoleOptions)
+
+
 })
