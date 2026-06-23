@@ -4,11 +4,6 @@ import { SideMenuOption, SidePanel } from "../components/SidePanel"
 
 test('Get all the usernames registered', async ({ page }) => {
 
-    const loginPage = new LoginPage(page)
-    await loginPage.doLogin('Admin', 'admin123')
-
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
-
     await page.getByRole('link', { name: 'Admin' }).click()
 
     await page.getByRole('navigation', { name: 'Topbar menu' }).getByText('User Management').click()
@@ -37,13 +32,6 @@ test('Get all the usernames registered', async ({ page }) => {
 test('Select specific user for edition', async ({ page }) => {
 
     const userForEdition = 'Belinda_Leuschke5123'
-
-    await page.goto('https://opensource-demo.orangehrmlive.com/')
-    await page.getByRole('textbox', { name: 'Username' }).fill('Admin')
-    await page.getByRole('textbox', { name: 'Password' }).fill('admin123')
-    await page.getByRole('button', { name: 'Login' }).click()
-
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
 
     await page.getByRole('link', { name: 'Admin' }).click()
 
@@ -74,9 +62,6 @@ test('Check user role options', async ({ page }) => {
 
     const expectedRoleOptions = ['-- Select --', 'Admin', 'ESS']
 
-    const loginPage = new LoginPage(page)
-    await loginPage.loginAsAdmin()
-
     const sidePanel = new SidePanel(page)
     await sidePanel.clickOnOption(SideMenuOption.ADMIN)
 
@@ -96,9 +81,6 @@ test('Filter by user admin', async ({ page }) => {
 
     await page.goto("https://www.google.com")
     await page.locator("xpath=//div[contains(., 'NonExisting')]").click()
-
-    const loginPage = new LoginPage(page)
-    await loginPage.loginAsAdmin()
 
     const sidePanel = new SidePanel(page)
     await sidePanel.clickOnOption(SideMenuOption.ADMIN)
@@ -132,16 +114,6 @@ test('Filter by user admin', async ({ page }) => {
 })
 
 test('Capture all amounts', async ({ page }) => {
-
-    const loginPage = new LoginPage(page)
-    await loginPage.doLogin('Admin', 'admin123')
-
-    /*await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
-
-    await page.getByRole('link', { name: 'Admin' }).click()
-
-    await page.getByRole('navigation', { name: 'Topbar menu' }).getByText('User Management').click()
-    await page.getByRole('menuitem', { name: 'Users' }).click()*/
 
     await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/claim/viewAssignClaim')
 

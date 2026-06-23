@@ -5,11 +5,7 @@ import { SideMenuOption, SidePanel } from '../components/SidePanel'
 
 test('Check left menu options', async ({ page }) => {
 
-
-    const loginPage = new LoginPage(page)
-    await loginPage.loginAsAdmin()
-
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
+    await page.goto("/web/index.php/dashboard/index")
 
     const leftMenuItems = page.getByLabel('Sidepanel').getByRole('listitem')
     const currentMenuItemsCount = await leftMenuItems.count()
@@ -46,13 +42,6 @@ test('Check left menu options', async ({ page }) => {
 
 test('Navigate through the left panel', async ({ page }) => {
 
-    await page.goto('https://opensource-demo.orangehrmlive.com/')
-    await page.getByRole('textbox', { name: 'Username' }).fill('Admin')
-    await page.getByRole('textbox', { name: 'Password' }).fill('admin123')
-    await page.getByRole('button', { name: 'Login' }).click()
-
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
-
     const leftMenuItems = page.getByLabel('Sidepanel').getByRole('listitem')
     const currentMenuItemsCount = await leftMenuItems.count()
 
@@ -86,15 +75,6 @@ test('Check all the qualification links', async({page}) => {
         
     ]
 
-    await page.goto('https://opensource-demo.orangehrmlive.com/')
-    await page.getByRole('textbox', { name: 'Username' }).fill('Admin')
-    await page.getByRole('textbox', { name: 'Password' }).fill('admin123')
-    await page.getByRole('button', { name: 'Login' }).click()
-
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
-
-    await page.getByRole('link', { name: 'Admin' }).click()
-
     await page.getByRole('navigation', { name: 'Topbar menu' }).getByText('Qualifications').click()
 
     const qualificationOptions = page.getByRole('menu').locator('li')
@@ -112,9 +92,6 @@ test('Check all the qualification links', async({page}) => {
 
 
 test('testing topbar menu', async({page}) => {
-
-    const loginPage = new LoginPage(page)
-    await loginPage.loginAsAdmin()
 
     const sidePanel = new SidePanel(page)
     await sidePanel.clickOnOption(SideMenuOption.ADMIN)
