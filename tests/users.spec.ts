@@ -4,6 +4,8 @@ import { SideMenuOption, SidePanel } from "../components/SidePanel"
 
 test('Get all the usernames registered', async ({ page }) => {
 
+    await page.goto("/web/index.php/dashboard/index")
+
     await page.getByRole('link', { name: 'Admin' }).click()
 
     await page.getByRole('navigation', { name: 'Topbar menu' }).getByText('User Management').click()
@@ -131,7 +133,7 @@ test('Capture all amounts', async ({ page }) => {
         const amount = await cell.textContent()
 
         console.log("this is the amount in text:", amount)
-        
+
         if (amount === null) {
             continue;
         }

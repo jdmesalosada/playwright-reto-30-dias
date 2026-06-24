@@ -8,7 +8,7 @@ const authStatePath = path.resolve(process.cwd(), '.auth', 'admin.json')
 
 setup('authentication as admin', async ({ page }) => {
     // Si el estado guardado sigue siendo válido, se reutiliza y se evita volver a iniciar sesión.
-    if (hasValidAuthState(authStatePath)) {
+    if (await hasValidAuthState(page, authStatePath)) {
         console.log('Auth state válido. Se omite el setup.')
         return
     }

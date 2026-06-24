@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test'
 import * as fs from 'fs'
 
 // Intenta extraer la fecha de expiración de un JWT a partir de su payload.
@@ -18,10 +19,32 @@ function getJwtExpiration(token: string): number | undefined {
     }
 }
 
-// Verifica si el archivo de autenticación contiene una sesión aún válida.
-export function hasValidAuthState(filePath: string): boolean {
+// Verifica si el archivo de autenticación contiene una sesión realmente útil.
+export async function hasValidAuthState(page: Page, filePath: string): Promise<boolean> {
     if (!fs.existsSync(filePath)) {
         return false
+    }
+
+    const browser = page.context().browser()
+    if (browser) {
+        const context = await browser.newContext({ storageState: filePath })
+        const tempPage = await context.newPage()
+
+        try {
+            await tempPage.goto('/')
+            await tempPage.waitForLoadState('domcontentloaded', { timeout: 10000 }).catch(() => undefined)
+
+            const adminLink = tempPage.getByRole('link', { name: 'Admin' })
+            const isAuthenticated = await adminLink.isVisible().catch(() => false)
+
+            if (isAuthenticated) {
+                return true
+            }
+        } catch (error) {
+            console.warn(`No se pudo validar ${filePath} en un contexto temporal:`, error)
+        } finally {
+            await context.close()
+        }
     }
 
     try {
@@ -31,7 +54,7 @@ export function hasValidAuthState(filePath: string): boolean {
         // Revisa si alguna cookie sigue vigente.
         const hasValidCookie = (state.cookies ?? []).some((cookie: { expires?: number | string | null }) => {
             if (cookie.expires === -1) {
-                return true
+                return false
             }
 
             return typeof cookie.expires === 'number' && cookie.expires > now
