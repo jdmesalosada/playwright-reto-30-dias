@@ -115,35 +115,40 @@ test('Filter by user admin', async ({ page }) => {
 
 })
 
-test('Capture all amounts', async ({ page }) => {
+test('capture all amounts', async({page}) => {
 
-    await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/claim/viewAssignClaim')
+    await page.goto('/web/index.php/claim/viewAssignClaim')
 
-    await page.waitForTimeout(4000)
-
-    const rows = page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row')
+    const allBodyRows = page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row')
     const amounts: number[] = []
 
-    const rowCount = await rows.count()
-    console.log("Number of rows", rowCount)
+    const rowCount = await allBodyRows.count()
+    console.log('Number of rows', rowCount)
 
-    for (let i = 1; i < rowCount; i++) {
+    for(let i=0; i<rowCount; i++){
 
-        const cell = rows.nth(i).getByRole('cell').nth(7)
-        const amount = await cell.textContent()
+        const amountCell = allBodyRows.nth(i).getByRole('cell').nth(7)
+        const amountText = await amountCell.textContent()
+        console.log("This is the amount in text: ", amountText)
 
-        console.log("this is the amount in text:", amount)
-
-        if (amount === null) {
-            continue;
+        if(amountText === null){
+            continue
         }
-        const convertedNumber = parseFloat(amount?.replace(/,/g, '').trim())
 
-        if (!Number.isNaN(convertedNumber)) {
-            amounts.push(convertedNumber)
-        }
+        const convertedNumber = parseFloat(amountText?.replace(/,/g, '').trim())
+
+        amounts.push(convertedNumber)
+
     }
 
     console.log(amounts)
+
+    let total = 0
+
+    for(let amount of amounts){
+        total += amount
+    }
+
+    console.log("total is", total)
 
 })
