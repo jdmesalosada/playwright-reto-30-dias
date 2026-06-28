@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { LoginPage } from "../pageobjects/LoginPage"
 import { SideMenuOption, SidePanel } from "../components/SidePanel"
+import { TopBarMenu } from "../components/top-bar-menu/TopBarMenu"
 
 test('Get all the usernames registered', async ({ page }) => {
 
@@ -115,7 +116,7 @@ test('Filter by user admin', async ({ page }) => {
 
 })
 
-test('capture all amounts', async({page}) => {
+test('capture all amounts', async ({ page }) => {
 
     await page.goto('/web/index.php/claim/viewAssignClaim')
 
@@ -125,13 +126,13 @@ test('capture all amounts', async({page}) => {
     const rowCount = await allBodyRows.count()
     console.log('Number of rows', rowCount)
 
-    for(let i=0; i<rowCount; i++){
+    for (let i = 0; i < rowCount; i++) {
 
         const amountCell = allBodyRows.nth(i).getByRole('cell').nth(7)
         const amountText = await amountCell.textContent()
         console.log("This is the amount in text: ", amountText)
 
-        if(amountText === null){
+        if (amountText === null) {
             continue
         }
 
@@ -145,10 +146,66 @@ test('capture all amounts', async({page}) => {
 
     let total = 0
 
-    for(let amount of amounts){
+    for (let amount of amounts) {
         total += amount
     }
 
     console.log("total is", total)
 
+})
+
+
+test('Add new user', async ({ page }) => {
+
+    const randomUsername = 'goku' + crypto.randomUUID()
+    const password = 'R4mdom45..*'
+    const employeeToSearch = 'Qwerty LName'
+
+    await page.goto('/web/index.php/dashboard/index')
+
+    const sidePanel = new SidePanel(page)
+    await sidePanel.clickOnOption(SideMenuOption.ADMIN)
+
+    const topBarMenu = new TopBarMenu(page)
+    await topBarMenu.userManagement.clickOnUsers()
+
+    await page.getByText('Add').click()
+
+    await page.locator('div.oxd-grid-item--gutters')
+        .filter({ has: page.getByText('User Role') })
+        .locator('div.oxd-select-text-input')
+        .click()
+
+    await page.getByText('ESS', { exact: true }).click()
+
+    await page.getByRole('textbox', { name: 'Type for hints...' }).fill(employeeToSearch)
+    await page.getByText('Qwerty Qwerty LName', { exact: true }).click()
+
+
+    await page.locator('div.oxd-grid-item--gutters')
+        .filter({ has: page.getByText('Status') })
+        .locator('div.oxd-select-text-input')
+        .click()
+
+    await page.getByText('Enabled').click()
+
+    await page.locator('div.oxd-grid-item--gutters')
+        .filter({ has: page.getByText('Username') })
+        .getByRole('textbox')
+        .fill(randomUsername)
+
+    await page.locator('div.oxd-grid-item--gutters')
+        .filter({ has: page.getByText('Password', { exact: true }) })
+        .getByRole('textbox')
+        .fill(password)
+
+    await page.locator('div.oxd-grid-item--gutters')
+        .filter({ has: page.getByText('Confirm Password', { exact: true }) })
+        .getByRole('textbox')
+        .fill(password)
+
+    await page.getByRole('button', {name: 'Save'}).click()
+
+    await expect(page.locator('p.oxd-text--toast-message')).toHaveText('Successfully Saved')
+         
 })
