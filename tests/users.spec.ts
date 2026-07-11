@@ -86,13 +86,14 @@ test('Check user role options', async ({ page }) => {
 
 test('Filter by user admin', async ({ page }) => {
 
-    await page.goto("https://www.google.com")
-    await page.locator("xpath=//div[contains(., 'NonExisting')]").click()
+    const navigate = new Navigate(page)
+    await navigate.toDashboard()
 
     const sidePanel = new SidePanel(page)
     await sidePanel.clickOnOption(SideMenuOption.ADMIN)
 
-    await page.locator("xpath=//div[contains(., 'NonExisting')]").click()
+    const topBarMenu = new TopBarMenu(page)
+    await topBarMenu.userManagement.clickOnUsers()
 
     const allBodyRows = page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row')
 
@@ -169,6 +170,7 @@ test('Add new user', async ({ page }) => {
 
     const topBarMenu = new TopBarMenu(page)
     await topBarMenu.userManagement.clickOnUsers()
+
 
     const adminUser = UserFactory.createAdmin({
         employee: 'FirstNameTest A LastNameTest'
