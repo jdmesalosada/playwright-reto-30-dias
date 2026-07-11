@@ -5,6 +5,7 @@ import { TopBarMenu } from "../components/top-bar-menu/TopBarMenu"
 import { Navigate } from "../pageobjects/Navigate"
 import { AddNewUserPage } from "../pageobjects/AddNewUserPage"
 import { UserModel } from "../models/UserModel"
+import { UserFactory } from "../factory/UserFactory"
 
 test('Get all the usernames registered', async ({ page }) => {
 
@@ -160,10 +161,6 @@ test('capture all amounts', async ({ page }) => {
 
 test('Add new user', async ({ page }) => {
 
-    const randomUsername = 'goku' + crypto.randomUUID()
-    const password = 'R4mdom45..*'
-    const employeeToSearch = 'Qwerty LName'
-
     const navigate = new Navigate(page)
     await navigate.toDashboard()
 
@@ -173,16 +170,11 @@ test('Add new user', async ({ page }) => {
     const topBarMenu = new TopBarMenu(page)
     await topBarMenu.userManagement.clickOnUsers()
 
-    const userToAdd: UserModel = {
-        username: randomUsername,
-        employee: employeeToSearch,
-        confirmPassword: password,
-        password: password,
-        role: 'ESS',
-        status: 'Enabled'
-    }
+    const adminUser = UserFactory.createAdmin({
+        employee: 'FirstNameTest A LastNameTest'
+    })
 
     const addNewUserPage = new AddNewUserPage(page)
-    await addNewUserPage.addNewUser(userToAdd)
+    await addNewUserPage.addNewUser(adminUser)
     await addNewUserPage.checkUserWasAddedMessage()
 })
