@@ -160,7 +160,7 @@ test('capture all amounts', async ({ page }) => {
 })
 
 
-test('Add new user', async ({ page }) => {
+test('Add new user admin', async ({ page }) => {
 
     const navigate = new Navigate(page)
     await navigate.toDashboard()
@@ -171,11 +171,29 @@ test('Add new user', async ({ page }) => {
     const topBarMenu = new TopBarMenu(page)
     await topBarMenu.userManagement.clickOnUsers()
 
+    const allBodyRows = page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row')
 
-    const adminUser = UserFactory.createAdmin({
-        employee: 'FirstNameTest A LastNameTest'
+    //Filas que contienen el role admin
+    const currentAdminRows = allBodyRows.filter({
+        has: page.getByRole('cell').nth(2).getByText('Admin')
     })
 
+    const firstAdminToSearch = currentAdminRows.nth(0)
+    await expect(firstAdminToSearch, "No admin users found in the table").toHaveCount(1)
+
+    await firstAdminToSearch
+        .locator('button')
+        .filter({ has: page.locator('i.bi-pencil-fill') }).click()
+
+
+    const fullUserToSearch = await page.getByRole('textbox', { name: 'Type for hints...' }).inputValue()
+    console.log(`User to search ${fullUserToSearch}`)
+
+    const adminUser = UserFactory.createAdmin({
+        employee: fullUserToSearch
+    })
+
+    await page.goBack()
     const addNewUserPage = new AddNewUserPage(page)
     await addNewUserPage.addNewUser(adminUser)
     await addNewUserPage.checkUserWasAddedMessage()
