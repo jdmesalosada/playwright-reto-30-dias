@@ -21,7 +21,7 @@ export class AddNewUserPage {
             .click()
 
         //await this.page.getByText(userRole, { exact: true }).click()
-        await this.page.getByRole('option', {name: userRole}).click()
+        await this.page.getByRole('option', { name: userRole }).click()
     }
 
     async selectEmployeeName(employeeName: string) {
@@ -80,4 +80,11 @@ export class AddNewUserPage {
         await this.enterConfirmPassword(user.confirmPassword)
         await this.clickOnSave()
     }
+
+    async getEmployeeName(): Promise<string> {
+        const fullUserToSearch = await this.page.getByRole('textbox', { name: 'Type for hints...' }).inputValue()
+        console.log(`User to search ${fullUserToSearch}`)
+        return fullUserToSearch
+    }
+
 }
