@@ -164,13 +164,7 @@ test('capture all amounts', async ({ page }) => {
 test('Add new user admin', async ({ page }) => {
 
     const navigate = new Navigate(page)
-    await navigate.toDashboard()
-
-    const sidePanel = new SidePanel(page)
-    await sidePanel.clickOnOption(SideMenuOption.ADMIN)
-
-    const topBarMenu = new TopBarMenu(page)
-    await topBarMenu.userManagement.clickOnUsers()
+    await navigate.toUsers()
 
     const usersTable = new UsersTable(page)
     await usersTable.editFirstAdminOnTheTable()
@@ -185,4 +179,33 @@ test('Add new user admin', async ({ page }) => {
     await page.goBack()
     await addNewUserPage.addNewUser(adminUser)
     await addNewUserPage.checkUserWasAddedMessage()
+})
+
+test('Delete user admin', async ({ page }) => {
+
+    //Arrange
+    const navigate = new Navigate(page)
+    await navigate.toUsers()
+
+    const usersTable = new UsersTable(page)
+    await usersTable.editFirstAdminOnTheTable()
+
+    const addNewUserPage = new AddNewUserPage(page)
+    const fullUserToSearch = await addNewUserPage.getEmployeeName()
+
+    const adminUser = UserFactory.createAdmin({
+        employee: fullUserToSearch
+    })
+
+    await page.goBack()
+    await addNewUserPage.addNewUser(adminUser)
+    await addNewUserPage.checkUserWasAddedMessage()
+
+    //Act
+    await usersTable.clickOnDeleteActionByUsername(adminUser.username)
+    await usersTable.acceptDeleteUser()
+
+    //Assert
+    await addNewUserPage.checkUserWasSuccessfullyDeletedMessage()
+
 })
