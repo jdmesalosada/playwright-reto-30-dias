@@ -122,7 +122,7 @@ test('Filter by user admin', async ({ page }) => {
 
 })
 
-test('capture all amounts', async ({ page }) => {
+test('capture all amounts @slow', async ({ page }) => {
 
     await page.goto('/web/index.php/claim/viewAssignClaim')
 
@@ -161,7 +161,7 @@ test('capture all amounts', async ({ page }) => {
 })
 
 
-test('Add new user admin', async ({ page }) => {
+test('Add new user admin @users @slow', async ({ page }) => {
 
     const navigate = new Navigate(page)
     await navigate.toUsers()
@@ -181,7 +181,7 @@ test('Add new user admin', async ({ page }) => {
     await addNewUserPage.checkUserWasAddedMessage()
 })
 
-test('Delete user admin', async ({ page }) => {
+test('Delete user admin @users @slow', async ({ page }) => {
 
     //Arrange
     const navigate = new Navigate(page)
