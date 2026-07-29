@@ -1,9 +1,12 @@
 name: Playwright Tests Updated
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      grep: 
+        description: "Campo opcional para filtrar los tests de playwright"
+        required: false
+        default: ''
+        tpype: string
 jobs:
   test:
     timeout-minutes: 60
@@ -22,7 +25,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test --grep "Get all the usernames registered" --project="Admin"
+      run: |
+        if [ -n "${{github.event.inputs.grep}}" ]; then
+          npx playwright test --grep "${{github.event.inputs.grep}}" --project="admin"
+        else
+          npx playwright test --project="admin"
+        fi  
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
