@@ -1,12 +1,25 @@
 name: Playwright Tests Updated
 on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches : [main, master] 
+
   workflow_dispatch:
     inputs:
       grep: 
         description: "Campo opcional para filtrar los tests de playwright"
         required: false
         default: ''
-        tpype: string
+        type: string
+      project:
+        description: "Selecciona el proyecto de playwright"
+        required: true
+        default: "admin"
+        type: choice
+        options:
+          - admin
+          - employee  
 jobs:
   test:
     timeout-minutes: 60
@@ -27,9 +40,9 @@ jobs:
     - name: Run Playwright tests
       run: |
         if [ -n "${{github.event.inputs.grep}}" ]; then
-          npx playwright test --grep "${{github.event.inputs.grep}}" --project="admin"
+          npx playwright test --grep "${{github.event.inputs.grep}}" --project="${{github.event.inputs.project}}"
         else
-          npx playwright test --project="admin"
+          npx playwright test --project="${{github.event.inputs.project}}"
         fi  
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
