@@ -43,7 +43,7 @@ jobs:
       run: |
         echo "Starting playwright tests..."
         echo "Project selected: $PROJECT"
-        ECHO "Playwright filter: $GREP"
+        echo "Playwright filter: $GREP"
         if [ -n "${{github.event.inputs.grep}}" ]; then
           npx playwright test --grep "$GREP" --project="$PROJECT"
         else
