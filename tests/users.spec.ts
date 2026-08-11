@@ -7,16 +7,16 @@ import { AddNewUserPage } from "../pageobjects/AddNewUserPage"
 import { UserModel } from "../models/UserModel"
 import { UserFactory } from "../factory/UserFactory"
 import { UsersTable } from "../components/UsersTable"
-import {readFile} from 'fs/promises'
+import { readFile } from 'fs/promises'
 import * as path from 'path'
 
 
-test('API Get All the users', async({page, request}) => {
+test('API Get All the users', async ({ page, request }) => {
 
     const authFilePath = path.resolve(process.cwd(), '.auth', 'admin.json')
 
     const authState = JSON.parse(await readFile(authFilePath, 'utf-8')) as {
-        cookies?: Array<{name: string, value: string}>
+        cookies?: Array<{ name: string, value: string }>
     }
 
     const orangeHrmCookie = authState.cookies?.find(cookie => cookie.name = 'orangehrm')
@@ -29,7 +29,38 @@ test('API Get All the users', async({page, request}) => {
             Cookie: cookieHeader,
             Accept: 'application/json'
         }
-    } )
+    })
+
+    expect(response.ok()).toBeTruthy()
+
+    const bodyJson = await response.json()
+    console.log(JSON.stringify(await bodyJson))
+
+})
+
+test('API Add a new user', async ({ page, request }) => {
+
+    const authFilePath = path.resolve(process.cwd(), '.auth', 'admin.json')
+
+    const authState = JSON.parse(await readFile(authFilePath, 'utf-8')) as {
+        cookies?: Array<{ name: string, value: string }>
+    }
+
+    const username = 'user-' + crypto.randomUUID().slice(0, 30)
+    const password = 'P4ssw0rd.11'
+
+    const orangeHrmCookie = authState.cookies?.find(cookie => cookie.name = 'orangehrm')
+    expect(orangeHrmCookie, 'The oranagehrm cookie was not found in the saved auth state').toBeTruthy()
+
+    const cookieHeader = `orangehrm=${orangeHrmCookie?.value}`
+
+    const response = await request.post('https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/admin/users', {
+        headers: {
+            Cookie: cookieHeader,
+            Accept: 'application/json'
+        },
+        data: { "username": username, "password": password, "status": true, "userRoleId": 1, "empNumber": 7 }
+    })
 
     expect(response.ok()).toBeTruthy()
 
