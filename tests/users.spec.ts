@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { expect, request, test } from "@playwright/test"
 import { LoginPage } from "../pageobjects/LoginPage"
 import { SideMenuOption, SidePanel } from "../components/SidePanel"
 import { TopBarMenu } from "../components/top-bar-menu/TopBarMenu"
@@ -7,6 +7,36 @@ import { AddNewUserPage } from "../pageobjects/AddNewUserPage"
 import { UserModel } from "../models/UserModel"
 import { UserFactory } from "../factory/UserFactory"
 import { UsersTable } from "../components/UsersTable"
+import {readFile} from 'fs/promises'
+import * as path from 'path'
+
+
+test('API Get All the users', async({page, request}) => {
+
+    const authFilePath = path.resolve(process.cwd(), '.auth', 'admin.json')
+
+    const authState = JSON.parse(await readFile(authFilePath, 'utf-8')) as {
+        cookies?: Array<{name: string, value: string}>
+    }
+
+    const orangeHrmCookie = authState.cookies?.find(cookie => cookie.name = 'orangehrm')
+    expect(orangeHrmCookie, 'The oranagehrm cookie was not found in the saved auth state').toBeTruthy()
+
+    const cookieHeader = `orangehrm=${orangeHrmCookie?.value}`
+
+    const response = await request.get('https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/admin/users?limit=50&offset=0&sortField=u.userName&sortOrder=ASC', {
+        headers: {
+            Cookie: cookieHeader,
+            Accept: 'application/json'
+        }
+    } )
+
+    expect(response.ok()).toBeTruthy()
+
+    const bodyJson = await response.json()
+    console.log(JSON.stringify(await bodyJson))
+
+})
 
 test('Get all the usernames registered', async ({ page }) => {
 
