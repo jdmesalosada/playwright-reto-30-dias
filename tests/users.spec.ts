@@ -69,6 +69,58 @@ test('API Add a new user', async ({ page, request }) => {
 
 })
 
+test('API Delete a user', async ({ page, request }) => {
+
+    const authFilePath = path.resolve(process.cwd(), '.auth', 'admin.json')
+
+    const authState = JSON.parse(await readFile(authFilePath, 'utf-8')) as {
+        cookies?: Array<{ name: string, value: string }>
+    }
+
+    const username = 'user-' + crypto.randomUUID().slice(0, 30)
+    const password = 'P4ssw0rd.11'
+
+    const orangeHrmCookie = authState.cookies?.find(cookie => cookie.name = 'orangehrm')
+    expect(orangeHrmCookie, 'The oranagehrm cookie was not found in the saved auth state').toBeTruthy()
+
+    const cookieHeader = `orangehrm=${orangeHrmCookie?.value}`
+
+    const response = await request.post('https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/admin/users', {
+        headers: {
+            Cookie: cookieHeader,
+            Accept: 'application/json'
+        },
+        data: { "username": username, "password": password, "status": true, "userRoleId": 1, "empNumber": 7 }
+    })
+
+    expect(response.ok()).toBeTruthy()
+
+    const bodyJson = await response.json()
+    console.log(JSON.stringify(await bodyJson))
+
+    const userId = await bodyJson.data.id
+    console.log(`User id: ${userId}`)
+
+    const userDeletionResponse = await request.delete('https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/admin/users', {
+        headers: {
+            Cookie: cookieHeader,
+            Accept: 'application/json'
+        },
+        data: {
+            "ids": [
+                userId
+            ]
+        }
+    })
+
+    expect(userDeletionResponse.ok()).toBeTruthy()
+
+    const userDeletionResponseJson = await userDeletionResponse.json()
+    console.log(JSON.stringify(await userDeletionResponseJson))
+
+
+})
+
 test('Get all the usernames registered', async ({ page }) => {
 
     await page.goto("/web/index.php/dashboard/index")
