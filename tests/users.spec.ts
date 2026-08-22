@@ -9,28 +9,13 @@ import { UserFactory } from "../factory/UserFactory"
 import { UsersTable } from "../components/UsersTable"
 import { readFile } from 'fs/promises'
 import * as path from 'path'
+import { UsersApiClient } from "../api/UsersApiClient"
 
 
-test('API Get All the users', async ({ page, request }) => {
+test('API Get All the users', async ({ request }) => {
 
-    const authFilePath = path.resolve(process.cwd(), '.auth', 'admin.json')
-
-    const authState = JSON.parse(await readFile(authFilePath, 'utf-8')) as {
-        cookies?: Array<{ name: string, value: string }>
-    }
-
-    const orangeHrmCookie = authState.cookies?.find(cookie => cookie.name = 'orangehrm')
-    expect(orangeHrmCookie, 'The oranagehrm cookie was not found in the saved auth state').toBeTruthy()
-
-    const cookieHeader = `orangehrm=${orangeHrmCookie?.value}`
-
-    const response = await request.get('https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/admin/users?limit=50&offset=0&sortField=u.userName&sortOrder=ASC', {
-        headers: {
-            Cookie: cookieHeader,
-            Accept: 'application/json'
-        }
-    })
-
+    const apiClient = await UsersApiClient.fromSavedAuthState(request)
+    const response = await apiClient.getUsers()
     expect(response.ok()).toBeTruthy()
 
     const bodyJson = await response.json()
